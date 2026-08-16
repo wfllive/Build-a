@@ -148,9 +148,9 @@ jobs:
         working-directory: ${{ steps.locate.outputs.android_dir }}
         run: |
           if [ -f gradlew ]; then
-            ./gradlew assembleReleaseRustore --no-daemon --stacktrace
+            ./gradlew assembleRustoreRelease --no-daemon --stacktrace
           else
-            gradle assembleReleaseRustore --no-daemon --stacktrace
+            gradle assembleRustoreRelease --no-daemon --stacktrace
           fi
 
       - name: Build AAB Release
