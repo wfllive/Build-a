@@ -148,9 +148,9 @@ jobs:
         working-directory: ${{ steps.locate.outputs.android_dir }}
         run: |
           if [ -f gradlew ]; then
-            ./gradlew assembleRelease --no-daemon --stacktrace
+            ./gradlew assembleReleaseRustore --no-daemon --stacktrace
           else
-            gradle assembleRelease --no-daemon --stacktrace
+            gradle assembleReleaseRustore --no-daemon --stacktrace
           fi
 
       - name: Build AAB Release
@@ -164,6 +164,23 @@ jobs:
           fi
 
       # ─────────────────────────────────────────────
+      # Диагностика: показываем, что реально сгенерировалось
+      # ─────────────────────────────────────────────
+      - name: List build outputs
+        if: always()
+        working-directory: ${{ steps.locate.outputs.android_dir }}
+        shell: bash
+        run: |
+          echo "=== APK files ==="
+          find . -type f -name "*.apk" 2>/dev/null || true
+          echo ""
+          echo "=== AAB files ==="
+          find . -type f -name "*.aab" 2>/dev/null || true
+          echo ""
+          echo "=== build/outputs tree ==="
+          find . -type d -path "*/build/outputs*" 2>/dev/null || true
+
+      # ─────────────────────────────────────────────
       # Загрузка артефактов
       # ─────────────────────────────────────────────
       - name: Upload APK Debug
@@ -171,7 +188,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: android-apk-debug
-          path: ${{ steps.locate.outputs.android_dir }}/**/build/outputs/apk/debug/*.apk
+          path: |
+            ${{ steps.locate.outputs.android_dir }}/**/build/outputs/apk/**/*.apk
+            ${{ steps.locate.outputs.android_dir }}/**/build/outputs/**/*-debug*.apk
           retention-days: 14
           if-no-files-found: error
 
@@ -180,7 +199,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: android-apk-release
-          path: ${{ steps.locate.outputs.android_dir }}/**/build/outputs/apk/release/*.apk
+          path: |
+            ${{ steps.locate.outputs.android_dir }}/**/build/outputs/apk/**/*.apk
+            ${{ steps.locate.outputs.android_dir }}/**/build/outputs/**/*-release*.apk
+            ${{ steps.locate.outputs.android_dir }}/**/build/outputs/**/*-unsigned*.apk
           retention-days: 14
           if-no-files-found: error
 
@@ -189,7 +211,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: android-aab-release
-          path: ${{ steps.locate.outputs.android_dir }}/**/build/outputs/bundle/release/*.aab
+          path: |
+            ${{ steps.locate.outputs.android_dir }}/**/build/outputs/bundle/**/*.aab
+            ${{ steps.locate.outputs.android_dir }}/**/build/outputs/**/*.aab
           retention-days: 14
           if-no-files-found: error
 
