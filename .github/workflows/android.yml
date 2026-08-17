@@ -138,9 +138,9 @@ jobs:
         working-directory: ${{ steps.locate.outputs.android_dir }}
         run: |
           if [ -f gradlew ]; then
-            ./gradlew assembleDebug --no-daemon --stacktrace
+            ./gradlew assembleRustoreDebug --no-daemon --stacktrace
           else
-            gradle assembleDebug --no-daemon --stacktrace
+            gradle assembleRustoreDebug --no-daemon --stacktrace
           fi
 
       - name: Build APK Release
